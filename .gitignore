@@ -1,0 +1,61 @@
+# === Build & Dependencies (en cualquier nivel) ===
+**/dist/
+**/node_modules/
+**/build/
+
+# === Logs ===
+**/logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# === OS Files ===
+.DS_Store
+Thumbs.db
+
+# === Tests ===
+**/coverage/
+**/.nyc_output/
+
+# === IDEs & Editors ===
+**/.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# === VSCode ===
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# === Environment Variables ===
+**/.env
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local
+**/.env.local
+
+# === Temp & Cache ===
+**/.temp/
+**/.tmp/
+
+# === Runtime Data ===
+**/pids/
+*.pid
+*.seed
+*.pid.lock
+
+# === Diagnostic Reports ===
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# === Prisma generated files ===
+**/generated/prisma/
+.claude

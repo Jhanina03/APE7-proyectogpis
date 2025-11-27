@@ -1,0 +1,46 @@
+# docker-compose.prod.yml
+services:
+  # Backend NestJS
+  backend:
+    image: ${BACKEND_IMAGE:-sebi10cn/safetrade-backend}:latest
+    container_name: safetrade-backend
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN}
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SENDER_EMAIL: ${SENDER_EMAIL}
+      NODE_ENV: production
+      PORT: 3000
+    networks:
+      - safetrade-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Frontend React + Vite
+  frontend:
+    image: ${FRONTEND_IMAGE:-sebi10cn/safetrade-frontend}:latest
+    container_name: safetrade-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - safetrade-network
+    restart: unless-stopped
+
+networks:
+  safetrade-network:
+    driver: bridge

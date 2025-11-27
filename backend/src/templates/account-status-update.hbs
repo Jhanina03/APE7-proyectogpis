@@ -1,0 +1,63 @@
+<html>
+  <head>
+    <meta charset='UTF-8' />
+    <title>Account Status Update</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f7;
+        color: #51545e;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 600px;
+        margin: 40px auto;
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #333333;
+      }
+      .status {
+        font-size: 18px;
+        font-weight: bold;
+      }
+      .reason {
+        font-style: italic;
+      }
+      .btn {
+        display: inline-block;
+        color: white;
+        text-decoration: none;
+        padding: 12px 20px;
+        border-radius: 6px;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class='container'>
+      <h1>Account Status Updated</h1>
+      <p>Hi {{firstName}},</p>
+
+      <p>Your account status is now:
+        <span class='status' style='color: {{color}};'>{{status}}</span>
+      </p>
+
+      {{#if reason}}
+        <p class='reason' style='color: {{color}};'>Reason: {{reason}}</p>
+      {{/if}}
+
+      <a
+        href='{{loginUrl}}'
+        class='btn'
+        style='background-color: {{color}}; color: #ffffff; display:inline-block;'
+      >
+        Go to Main Page
+      </a>
+    </div>
+  </body>
+</html>

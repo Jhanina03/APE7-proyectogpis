@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Welcome!</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      background-color: #f4f4f7; 
+      color: #51545E; 
+      margin: 0; 
+      padding: 0; 
+    }
+    .container { 
+      max-width: 600px; 
+      margin: 40px auto; 
+      background-color: #ffffff; 
+      padding: 30px; 
+      border-radius: 8px; 
+      box-shadow: 0 0 10px rgba(0,0,0,0.1); 
+    }
+    h1 { 
+      color: #333333; 
+    }
+    ul { 
+      background-color: #f9f9f9; 
+      padding: 15px 25px; 
+      border-radius: 6px; 
+      list-style-type: none; 
+    }
+    ul li { 
+      margin-bottom: 10px; 
+      font-weight: bold; 
+    }
+    a { 
+      color: #4CAF50; 
+      text-decoration: none; 
+    }
+    a:hover { 
+      text-decoration: underline; 
+    }
+    .btn { 
+      display: inline-block; 
+      background-color: #4CAF50; 
+      color: white; 
+      text-decoration: none; 
+      padding: 12px 20px; 
+      border-radius: 6px; 
+      margin-top: 20px; 
+    }
+    p { 
+      line-height: 1.6; 
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Hello {{name}},</h1>
+    <p>Welcome! Your account has been successfully created.</p>
+    <p>Here are your login credentials:</p>
+    <ul>
+      <li>Email: {{email}}</li>
+      <li>Password: {{password}}</li>
+    </ul>
+    <p>You can login here:</p>
+    <a href="{{loginUrl}}" class="btn">Go to Login Page</a>
+    <p>We recommend changing your password after your first login.</p>
+    <p>Thank you for joining us!</p>
+  </div>
+</body>
+</html>

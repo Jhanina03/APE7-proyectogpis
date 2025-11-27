@@ -1,0 +1,175 @@
+// This is your Prisma schema file
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ProductType {
+  PRODUCT
+  SERVICE
+}
+
+enum ProductStatus {
+  ACTIVE
+  REPORTED
+  SUSPENDED
+  DELETED
+  DEACTIVATED
+  BANNED
+}
+
+enum Category {
+  ELECTRONICS
+  FASHION
+  HOME
+  SERVICES
+  SPORTS
+  BOOKS
+  TOYS
+  AUTOMOTIVE
+  OTHER
+}
+
+enum ReportType {
+  DANGEROUS
+  FRAUD
+  INAPPROPRIATE
+  OTHER
+}
+
+enum IncidentStatus {
+  PENDING
+  APPEALED
+  REJECTED
+  ACCEPTED
+}
+
+enum Role {
+  CLIENT
+  MODERATOR
+  ADMIN
+}
+
+enum TokenType {
+  VERIFICATION
+  RECOVERY
+}
+
+model User {
+  id           String  @id @default(uuid())
+  nationalId   String  @unique
+  firstName    String
+  lastName     String
+  email        String  @unique
+  phone        String?
+  gender       String?
+  passwordHash String
+  role         Role    @default(CLIENT)
+  isActive     Boolean @default(true)
+  isVerified   Boolean @default(false)
+
+  address String?
+
+  latitude  Float?
+  longitude Float?
+  location  Unsupported("geometry(point, 4326)")? // PostGIS POINT type
+
+  // Relations
+  tokens                   Token[]
+  products                 Product[]  @relation("UserProducts")
+  moderatedIncidents       Incident[] @relation("ModeratorIncidents")
+  appealModeratedIncidents Incident[] @relation("AppealModeratorIncidents")
+  likes                    Likes[]
+  createdAt                DateTime   @default(now())
+  updatedAt                DateTime   @updatedAt
+  reportedIncidents        Incident[] @relation("ReporterIncidents")
+
+  @@index([location], type: Gist)
+}
+
+model Token {
+  id        String    @id @default(uuid())
+  token     String
+  type      TokenType
+  expiresAt DateTime
+  used      Boolean   @default(false)
+  createdAt DateTime  @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+}
+
+model Product {
+  id           Int                                   @id @default(autoincrement())
+  code         String                                @unique
+  name         String
+  description  String
+  price        Float
+  availability Boolean                               @default(true)
+  type         ProductType                           @default(PRODUCT)
+  status       ProductStatus                         @default(ACTIVE)
+  category     Category                              @default(OTHER)
+  address      String?
+  latitude     Float?
+  longitude    Float?
+  location     Unsupported("geometry(point, 4326)")? // PostGIS POINT type
+  addressType  String?
+
+  serviceHours String?
+  deletedAt    DateTime?
+  images       ProductImage[]
+  incidents    Incident[]
+  publishDate  DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  likes        Likes[]
+
+  user   User?   @relation("UserProducts", fields: [userId], references: [id])
+  userId String?
+
+  @@index([location], type: Gist)
+}
+
+model Likes {
+  id        Int     @id @default(autoincrement())
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+
+  @@unique([userId, productId])
+}
+
+model ProductImage {
+  id        Int     @id @default(autoincrement())
+  url       String
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+}
+
+model Incident {
+  id        Int            @id @default(autoincrement())
+  product   Product        @relation(fields: [productId], references: [id])
+  productId Int
+  type      ReportType
+  comment   String?
+  status    IncidentStatus @default(PENDING)
+
+  reporter   User?   @relation("ReporterIncidents", fields: [reporterId], references: [id])
+  reporterId String?
+
+  moderator   User?   @relation("ModeratorIncidents", fields: [moderatorId], references: [id])
+  moderatorId String?
+
+  appealReason      String?
+  appealModerator   User?   @relation("AppealModeratorIncidents", fields: [appealModeratorId], references: [id])
+  appealModeratorId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

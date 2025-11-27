@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Product Review Notification</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f4f4f7; color: #51545E; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    h1 { color: #333333; }
+    .status { font-weight: bold; color: #4CAF50; }
+    .reason { font-style: italic; color: #FF4C4C; }
+    .btn { display: inline-block; background-color: #FF9800; color: white; text-decoration: none; padding: 12px 20px; border-radius: 6px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Product Review Notification</h1>
+    <p>Hi {{firstName}},</p>
+    <p>Your product "<b>{{productName}}</b>" has been reviewed by our moderators.</p>
+    <p>Status: <span class="status">{{status}}</span></p>
+    {{#if reason}}
+    <p class="reason">Reason: {{reason}}</p>
+    {{/if}}
+  </div>
+</body>
+</html>

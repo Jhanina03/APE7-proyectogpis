@@ -1,0 +1,61 @@
+services:
+  # Backend NestJS
+  backend:
+    image: safetrade-backend:latest
+    container_name: safetrade-backend
+    ports:
+      - "3000:3000"
+    environment:
+      # Database
+      - DATABASE_URL=${DATABASE_URL}
+      # JWT
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN}
+      - JWT_REFRESH_EXPIRES_IN=${JWT_REFRESH_EXPIRES_IN}
+      # Cloudinary
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+      # Email
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - SENDER_EMAIL=${SENDER_EMAIL}
+      # Node Environment
+      - NODE_ENV=production
+      - PORT=3000
+    volumes:
+      - ./backend/prisma:/app/prisma
+    networks:
+      - safetrade-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Frontend React + Vite
+  frontend:
+    image: safetrade-frontend:latest
+    container_name: safetrade-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - safetrade-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:5173 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  safetrade-network:
+    driver: bridge
+
+# Volúmenes (opcional si quieres persistir datos localmente)
+# volumes:
+#   backend-data:

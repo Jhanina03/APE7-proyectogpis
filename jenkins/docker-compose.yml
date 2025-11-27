@@ -1,0 +1,29 @@
+services:
+  jenkins:
+    build: .
+    container_name: jenkins-safetrade
+    user: root
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins-data:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    restart: unless-stopped
+    entrypoint: >
+      /bin/bash -c "
+      echo '🔧 Configurando Docker BuildX...' &&
+      while ! docker version > /dev/null 2>&1; do
+        echo '⏳ Esperando que Docker esté disponible...' &&
+        sleep 2
+      done &&
+      docker buildx create --name jenkins-builder --use || true &&
+      docker buildx inspect --bootstrap || true &&
+      echo '✅ Docker BuildX configurado' &&
+      /usr/local/bin/jenkins.sh
+      "
+
+volumes:
+  jenkins-data:
