@@ -14,7 +14,6 @@ COPY prisma ./prisma/
 RUN npm ci --ignore-scripts
 RUN npx prisma generate
 
-
 # ========= Etapa 2: Compilación =========
 FROM node:22-alpine AS build
 
@@ -29,13 +28,15 @@ COPY --from=deps /usr/src/app/node_modules ./node_modules
 # Compilar NestJS
 RUN npm run build
 
-
 # ========= Etapa 3: Imagen de ejecución =========
 FROM node:22-alpine AS runner
 
 WORKDIR /usr/src/app
 
-# Crear usuario seguro (diferente al de tu amigo)
+# Instalar curl necesario para healthcheck
+RUN apk add --no-cache curl
+
+# Crear usuario seguro
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 # Copiar archivos necesarios desde las etapas anteriores
@@ -47,7 +48,7 @@ COPY prisma ./prisma
 USER appuser
 
 ENV NODE_ENV=production
-
 EXPOSE 3000
 
+# Comando de arranque
 CMD ["node", "dist/main"]
