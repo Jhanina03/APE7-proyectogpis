@@ -94,19 +94,21 @@ environment {
                     sh 'rm -f .env .env.deploy'
                     
                     // Crear .env con writeFile (más confiable)
-                    def envContent = """DATABASE_URL=${env.DATABASE_URL}
-        JWT_SECRET=${env.JWT_SECRET}
-        JWT_EXPIRES_IN=${env.JWT_EXPIRES_IN}
-        JWT_REFRESH_EXPIRES_IN=${env.JWT_REFRESH_EXPIRES_IN}
-        CLOUDINARY_CLOUD_NAME=${env.CLOUDINARY_CLOUD_NAME}
-        CLOUDINARY_API_KEY=${env.CLOUDINARY_API_KEY}
-        CLOUDINARY_API_SECRET=${env.CLOUDINARY_API_SECRET}
-        SMTP_USER=${env.SMTP_USER}
-        SMTP_PASS=${env.SMTP_PASS}
-        SENDER_EMAIL=${env.SENDER_EMAIL}
-        VITE_API_URL=http://localhost:3000
-        NODE_ENV=production
-        PORT=3000"""
+            def envContent = """DATABASE_URL=${env.DATABASE_URL}
+            JWT_SECRET=${env.JWT_SECRET}
+            JWT_EXPIRES_IN=${env.JWT_EXPIRES_IN}
+            JWT_REFRESH_EXPIRES_IN=${env.JWT_REFRESH_EXPIRES_IN}
+            CLOUDINARY_CLOUD_NAME=${env.CLOUDINARY_CLOUD_NAME}
+            CLOUDINARY_API_KEY=${env.CLOUDINARY_API_KEY}
+            CLOUDINARY_API_SECRET=${env.CLOUDINARY_API_SECRET}
+            SMTP_USER=${env.SMTP_USER}
+            SMTP_PASS=${env.SMTP_PASS}
+            SENDER_EMAIL=${env.SENDER_EMAIL}
+            VITE_API_URL=http://localhost:3000
+            NODE_ENV=production
+            PORT=3000
+            """
+
                     
                     writeFile file: '.env', text: envContent
                     
