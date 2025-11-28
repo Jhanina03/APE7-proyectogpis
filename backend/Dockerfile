@@ -4,7 +4,7 @@ FROM node:22-alpine AS deps
 WORKDIR /usr/src/app
 
 # Prisma requiere OpenSSL
-RUN apk add --no-cache openssl
+RUN apk add --no-cache openssl-dev
 
 # Copiar lo mínimo primero
 COPY package*.json ./
