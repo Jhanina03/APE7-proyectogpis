@@ -1,8 +1,11 @@
-# docker-compose.prod.yml
+version: "3.9"
+
 services:
-  # Backend NestJS
+  # ============================
+  # Backend - NestJS SafeTrade
+  # ============================
   backend:
-    image: ${BACKEND_IMAGE:-sebi10cn/safetrade-backend}:latest
+    image: ${BACKEND_IMAGE:-safetrade/backend}:latest
     container_name: safetrade-backend
     ports:
       - "3000:3000"
@@ -11,36 +14,49 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
       JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN}
+
       CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
       CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
       CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+
       SMTP_USER: ${SMTP_USER}
       SMTP_PASS: ${SMTP_PASS}
       SENDER_EMAIL: ${SENDER_EMAIL}
+
       NODE_ENV: production
       PORT: 3000
     networks:
       - safetrade-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
-      interval: 30s
-      timeout: 10s
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/health || exit 1"]
+      interval: 20s
+      timeout: 5s
       retries: 5
+      start_period: 15s
 
-  # Frontend React + Vite
+  # ============================
+  # Frontend - Vite + Nginx SafeTrade
+  # ============================
   frontend:
-    image: ${FRONTEND_IMAGE:-sebi10cn/safetrade-frontend}:latest
+    image: ${FRONTEND_IMAGE:-safetrade/frontend}:latest
     container_name: safetrade-frontend
+
+    # ATENCIÓN: nginx expone el puerto 80, no el 5173
     ports:
-      - "5173:5173"
+      - "5173:80"
+
     depends_on:
       backend:
         condition: service_healthy
+
     networks:
       - safetrade-network
     restart: unless-stopped
 
+# ============================
+# Network
+# ============================
 networks:
   safetrade-network:
     driver: bridge

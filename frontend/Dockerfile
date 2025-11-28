@@ -1,35 +1,51 @@
-# Etapa 1: Builder - Instalar dependencias y hacer build
-FROM node:22-alpine AS builder
+############################
+# 1) Etapa de dependencias #
+############################
+FROM node:22-alpine AS deps
 
-WORKDIR /app
+WORKDIR /usr/src/frontend
 
-# Copiar archivos de dependencias
+# Copiar solo los archivos de dependencias
 COPY package*.json ./
 
-# Instalar dependencias
-RUN npm ci
+# Instalar dependencias sin scripts ni cache
+RUN npm ci --prefer-offline --no-audit
+
+###################################
+# 2) Etapa de compilación (build) #
+###################################
+FROM node:22-alpine AS build
+
+WORKDIR /usr/src/frontend
+
+# Copiar dependencias ya instaladas
+COPY --from=deps /usr/src/frontend/node_modules ./node_modules
 
 # Copiar el resto del código
 COPY . .
 
-# Argumento para la URL del API (se pasa desde docker-compose)
+# Variables de compilación
 ARG VITE_API_URL
-ENV VITE_API_URL=${VITE_API_URL}
+ENV VITE_API_URL=$VITE_API_URL
 
-# Construir la aplicación para producción
+# Build optimizado
 RUN npm run build
 
-# Etapa 2: Production - Servir con nginx
-FROM nginx:alpine AS production
+###############################
+# 3) Imagen final con Nginx   #
+###############################
+FROM nginx:stable-alpine AS runner
 
-# Copiar los archivos construidos desde el builder
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Borrar config por defecto (opcional pero ya lo diferencia)
+RUN rm -rf /etc/nginx/conf.d/default.conf
 
-# Copiar configuración personalizada de nginx
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copiar archivos optimizados del build
+COPY --from=build /usr/src/frontend/dist /var/www/app
 
-# Exponer el puerto 5173
+# Copiar config nginx personalizada
+COPY nginx.conf /etc/nginx/conf.d/app.conf
+
+# Exponer puerto de producción
 EXPOSE 5173
 
-# Nginx se ejecuta automáticamente
 CMD ["nginx", "-g", "daemon off;"]

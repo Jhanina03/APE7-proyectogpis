@@ -1,45 +1,53 @@
-FROM node:22-alpine AS builder
+# ========= Etapa 1: Dependencias =========
+FROM node:22-alpine AS deps
 
-# Instalar OpenSSL para Prisma
+WORKDIR /usr/src/app
+
+# Prisma requiere OpenSSL
 RUN apk add --no-cache openssl
 
-WORKDIR /app
-
-# Copiar solo lo necesario para instalar dependencias
+# Copiar lo mínimo primero
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Instalar dependencias
-RUN npm ci
-
-# Generar Prisma Client
+# Instalar dependencias sin scripts postinstall innecesarios
+RUN npm ci --ignore-scripts
 RUN npx prisma generate
 
-# Copiar el resto y construir
+
+# ========= Etapa 2: Compilación =========
+FROM node:22-alpine AS build
+
+WORKDIR /usr/src/app
+
+# Copiar el resto del código
 COPY . .
+
+# Copiar node_modules desde deps
+COPY --from=deps /usr/src/app/node_modules ./node_modules
+
+# Compilar NestJS
 RUN npm run build
 
-# Etapa de producción
-FROM node:22-alpine AS production
 
-RUN apk add --no-cache openssl curl
+# ========= Etapa 3: Imagen de ejecución =========
+FROM node:22-alpine AS runner
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
-# Copiar solo lo necesario desde builder
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/prisma ./prisma
+# Crear usuario seguro (diferente al de tu amigo)
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
-# Usuario no-root
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nestjs -u 1001
+# Copiar archivos necesarios desde las etapas anteriores
+COPY --from=build /usr/src/app/dist ./dist
+COPY --from=deps /usr/src/app/node_modules ./node_modules
+COPY package*.json ./
+COPY prisma ./prisma
 
-RUN chown -R nestjs:nodejs /app
-USER nestjs
+USER appuser
+
+ENV NODE_ENV=production
 
 EXPOSE 3000
 
-ENV NODE_ENV=production
 CMD ["node", "dist/main"]

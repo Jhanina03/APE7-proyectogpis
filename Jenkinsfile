@@ -1,27 +1,27 @@
 pipeline {
     agent any
     
-    environment {
-        // Nombres de las imágenes locales (sin registry)
-        BACKEND_IMAGE = 'safetrade-backend'
-        FRONTEND_IMAGE = 'safetrade-frontend'
-        
-        // Tag de la imagen (usando el número de build)
-        IMAGE_TAG = "${BUILD_NUMBER}"
-        
-        // Variables de entorno (configurar en Jenkins como secrets)
-        DATABASE_URL = credentials('database-url')
-        JWT_SECRET = credentials('jwt-secret')
-        JWT_EXPIRES_IN = credentials('jwt-expires-in') 
-        JWT_REFRESH_EXPIRES_IN = credentials('jwt-refresh-expires-in')
-        CLOUDINARY_CLOUD_NAME = credentials('cloudinary-cloud-name')
-        CLOUDINARY_API_KEY = credentials('cloudinary-api-key')
-        CLOUDINARY_API_SECRET = credentials('cloudinary-api-secret')
-        SMTP_USER =  credentials('smtp-user') 
-        SMTP_PASS = credentials('smtp-pass') 
-        SENDER_EMAIL = credentials('sender-email') 
-        VITE_API_URL = 'http://localhost:3000'
-    }
+environment {
+    BACKEND_IMAGE = 'safetrade-backend'
+    FRONTEND_IMAGE = 'safetrade-frontend'
+    IMAGE_TAG = "${BUILD_NUMBER}"
+
+    DATABASE_URL = credentials('DATABASE_URL')
+    JWT_SECRET = credentials('JWT_SECRET')
+    JWT_EXPIRES_IN = credentials('JWT_EXPIRES_IN')
+    JWT_REFRESH_EXPIRES_IN = credentials('JWT_REFRESH_EXPIRES_IN')
+
+    CLOUDINARY_CLOUD_NAME = credentials('CLOUDINARY_CLOUD_NAME')
+    CLOUDINARY_API_KEY = credentials('CLOUDINARY_API_KEY')
+    CLOUDINARY_API_SECRET = credentials('CLOUDINARY_API_SECRET')
+
+    SMTP_USER = credentials('SMTP_USER')
+    SMTP_PASS = credentials('SMTP_PASS')
+    SENDER_EMAIL = credentials('SENDER_EMAIL')
+
+    VITE_API_URL = 'http://localhost:3000'
+}
+
     
     stages {
         stage('📥 Checkout') {
