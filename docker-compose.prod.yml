@@ -1,9 +1,7 @@
 version: "3.9"
 
 services:
-  # ============================
   # Backend - NestJS SafeTrade
-  # ============================
   backend:
     image: ${BACKEND_IMAGE:-safetrade/backend}:latest
     container_name: safetrade-backend
@@ -35,14 +33,11 @@ services:
       retries: 5
       start_period: 15s
 
-  # ============================
   # Frontend - Vite + Nginx SafeTrade
-  # ============================
   frontend:
     image: ${FRONTEND_IMAGE:-safetrade/frontend}:latest
     container_name: safetrade-frontend
 
-    # ATENCIÓN: nginx expone el puerto 80, no el 5173
     ports:
       - "5173:80"
 
@@ -54,9 +49,6 @@ services:
       - safetrade-network
     restart: unless-stopped
 
-# ============================
-# Network
-# ============================
 networks:
   safetrade-network:
     driver: bridge

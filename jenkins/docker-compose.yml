@@ -14,14 +14,14 @@ services:
     restart: unless-stopped
     entrypoint: >
       /bin/bash -c '
-      echo "🔧 Configurando Docker BuildX..." &&
+      echo " Configurando Docker BuildX..." &&
       while ! docker version > /dev/null 2>&1; do
-        echo "⏳ Esperando que Docker esté disponible..." &&
+        echo " Esperando que Docker esté disponible..." &&
         sleep 2
       done &&
       docker buildx create --name safetrade-builder --use || true &&
       docker buildx inspect --bootstrap || true &&
-      echo "✅ Docker BuildX configurado" &&
+      echo " Docker BuildX configurado" &&
       /usr/local/bin/jenkins.sh
       '
 

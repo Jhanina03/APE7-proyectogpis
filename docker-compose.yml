@@ -1,9 +1,5 @@
-version: "3.9"
-
 services:
-  # ==========================================
-  # Backend SafeTrade (NestJS + Prisma)
-  # ==========================================
+#Backend SafeTrade (NestJS + Node.js)
   backend:
     image: safetrade-backend:latest
     container_name: safetrade-backend
@@ -35,20 +31,17 @@ services:
     restart: unless-stopped
 
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:3000/health || exit 1"]
-      interval: 20s
-      timeout: 5s
-      retries: 5
+      test: ["CMD-SHELL", "curl -f http://127.0.0.1:3000/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
       start_period: 40s
 
-  # ==========================================
   # Frontend SafeTrade (React + Vite + Nginx)
-  # ==========================================
   frontend:
     image: safetrade-frontend:latest
     container_name: safetrade-frontend
 
-    # Nginx expone el puerto 80 internamente
     ports:
       - "5173:80"
 
@@ -66,9 +59,7 @@ services:
       timeout: 5s
       retries: 3
 
-# ==========================================
 # Red del proyecto
-# ==========================================
 networks:
   safetrade-network:
     driver: bridge
